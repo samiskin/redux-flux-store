@@ -16,10 +16,10 @@
   "keywords": [
     "redux",
     "reducer",
-    "state",
-    "sync",
-    "electron",
-    "atom"
+    "flux",
+    "store",
+    "traditional",
+    "state"
   ],
   "author": "Shiranka Miskin",
   "license": "MIT",
