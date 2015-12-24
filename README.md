@@ -1,2 +1,3 @@
-# flux-store-reducer
-Allows Stores similar to Flux stores to be converted to a reducer function
+# redux-flux-store
+
+Allows objects which resemble stores in traiditional Flux to act as Reducers.
