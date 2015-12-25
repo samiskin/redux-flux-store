@@ -39,6 +39,7 @@
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "onchange": "^2.0.0",
+    "redux": "^3.0.5",
     "tape": "^4.2.2"
   }
 }

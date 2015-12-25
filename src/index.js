@@ -31,13 +31,13 @@ function initializeStoreMap(stateStoreMap) {
   return storeMap;
 }
 
-export default function fluxStoreEnhancer(stateStoreMap) {
+export function fluxEnhancer(stateStoreMap) {
   return (storeCreator) => {
     return (reducer, initialState) => {
 
       let storeMap = initializeStoreMap(stateStoreMap);
       let partiallyReducedState = null;
-      let reduceFromStores = (state, action) => {
+      let reduceFromStores = (state = {}, action) => {
         let newState = {};
         partiallyReducedState = _.assign({}, state);
 
@@ -53,7 +53,7 @@ export default function fluxStoreEnhancer(stateStoreMap) {
         return newState;
       }
 
-      augmentedReducer = (state, action) => {
+      let augmentedReducer = (state, action) => {
         let storeResult = reduceFromStores(state, action);
         let reducerResult = reducer(state, action);
         return objectMerge(storeResult, reducerResult);
@@ -64,6 +64,8 @@ export default function fluxStoreEnhancer(stateStoreMap) {
       store.getState = () => {
         return partiallyReducedState || storeDotGetState();
       };
+
+      return store;
 
     };
   };
