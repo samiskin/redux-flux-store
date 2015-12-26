@@ -56,7 +56,7 @@ export function fluxEnhancer(stateStoreMap) {
       let augmentedReducer = (state, action) => {
         let storeResult = reduceFromStores(state, action);
         let reducerResult = reducer(state, action);
-        return objectMerge(storeResult, reducerResult);
+        return objectMerge(reducerResult, storeResult);
       }
 
       let store = storeCreator(augmentedReducer, initialState);
