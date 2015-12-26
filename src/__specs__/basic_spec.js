@@ -4,6 +4,7 @@ import { fluxEnhancer } from '../index';
 import { createStore } from 'redux';
 
 
+var store = null;
 let basicReducer = (state = {}, action) => {
   return state;
 }
@@ -25,14 +26,9 @@ class IncrementStoreClass {
   }
 }
 
-let IncrementStore = new IncrementStoreClass();
+var IncrementStore = new IncrementStoreClass();
 
-class CounterStoreClass {
-
-  constructor() {
-    this.storeDependencies = [IncrementStore];
-  }
-
+class IndependantCounterStoreClass {
   reduce(state = 0, action, waitFor) {
     let amt = 1;
     switch(action.type) {
@@ -48,19 +44,19 @@ class CounterStoreClass {
   }
 }
 
-class IndependantCounterStoreClass extends CounterStoreClass {
-  constructor() {
-    super();
-    this.storeDependencies = [];
+class DependantCounterStoreClass extends IndependantCounterStoreClass{
+  reduce(state = 0, action, waitFor) {
+    waitFor([IncrementStore]);
+    return super.reduce(state, action, waitFor);
   }
 }
 
-let CounterStore = new CounterStoreClass();
-let IndependantCounterStore = new IndependantCounterStoreClass();
+var DependantCounterStore = new DependantCounterStoreClass();
+var IndependantCounterStore = new IndependantCounterStoreClass();
 
-var store = fluxEnhancer({
+store = fluxEnhancer({
   counterIndependant: IndependantCounterStore,
-  counter: CounterStore,
+  counter: DependantCounterStore,
   increment: IncrementStore
 })(createStore)(basicReducer);
 

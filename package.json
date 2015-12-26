@@ -1,10 +1,11 @@
 {
   "name": "redux-flux-store",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Redux store enhancer which converts Flux like stores into a reducer function",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
+    "clean": "rm -rf lib",
     "watch": "babel -d lib/ src/ --watch --sourceMaps=true",
     "test-watch": "onchange './src/**/*.js' -- tape ./lib/**/__specs__/*.js",
     "prepublish": "npm run compile"
