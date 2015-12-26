@@ -51,7 +51,6 @@ class DependantCounterStoreClass extends IndependantCounterStoreClass{
   }
 }
 
-
 var DependantCounterStore = new DependantCounterStoreClass();
 var IndependantCounterStore = new IndependantCounterStoreClass();
 
@@ -67,16 +66,3 @@ test('Basic functionality', (t) => {
   store.dispatch({type: 'INCREMENT'});
   t.deepEquals(store.getState(), {counter: 2, counterIndependant: 1, increment: 2});
 });
-
-
-
-
-
-
-
-
-
-
-
-
-

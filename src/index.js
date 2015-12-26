@@ -1,25 +1,14 @@
 import _ from 'lodash';
 import objectMerge from 'object-merge';
 
-
 /**
- * Creates a store enhancer which augments the store's state to include keys and avlues
- * specified by Store's similar to those used in traditional Flux
+ * Creates a store enhancer which augments the store's state to include keys
+ * and values specified by Store's similar to those used in traditional Flux
  * @param {Object} storeMap - A mapping of a property key to an object which contains a `reduce(state, action, waitFor)` method
- * @example
- * let finalCreateStore = compose(
- *   fluxEnhancer({
- *     teams: TeamStore,
- *     notifications: NotificationStore,
- *     settings: SettingStore
- *   }),
- *   applyMiddleware(...middleware)
- * )(createStore);
 */
 export function fluxEnhancer(storeMap) {
   return (storeCreator) => {
     return (reducer, initialState) => {
-
       // Map stores -> keys for easy access in reduce
       let storesToKeys = _.reduce(storeMap, (result, store, key) => {
         return result.set(store, key);
@@ -69,7 +58,6 @@ export function fluxEnhancer(storeMap) {
       };
 
       return store;
-
     };
   };
 }
