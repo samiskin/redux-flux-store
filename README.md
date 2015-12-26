@@ -1,3 +1,3 @@
 # redux-flux-store
 
-Allows objects which resemble stores in traiditional Flux to act as Reducers.
+This [store enhancer](https://github.com/rackt/redux/blob/master/docs/Glossary.md#store-enhancer) allows  objects which resemble stores in traiditional Flux to be used in a [Redux](https://github.com/rackt/redux/) Reducer.
