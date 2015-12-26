@@ -1,54 +1,46 @@
 import _ from 'lodash';
 import objectMerge from 'object-merge';
 
-function initializeStoreMap(stateStoreMap) {
-  let invertedMap = _.transform(stateStoreMap, (map, store, prop) => {
-    return map.set(store, prop);
-  }, new Map());
-
-  let waitingSet = new Set();
-  let storeMap = new Map();
-  _.forEach(stateStoreMap, (store) => waitingSet.add(store));
-
-  let assignStore = (store) => {
-    if (storeMap.has(store)) return;
-    if (store === undefined || !waitingSet.has(store)) {
-      throw new Error('Undefined store, check for circular dependencies in storeDependencies');
-    }
-
-    waitingSet.delete(store);
-    if (Array.isArray(store.storeDependencies)) {
-      store.storeDependencies.forEach((dependency) => assignStore(dependency));
-    }
-    storeMap.set(store, invertedMap.get(store));
-  };
-
-  while (waitingSet.size > 0) {
-    let store = waitingSet.entries().next().value[0];
-    assignStore(store);
-  }
-
-  return storeMap;
-}
-
-export function fluxEnhancer(stateStoreMap) {
+/**
+ * Creates a store enhancer which augments the store's state to include keys
+ * and values specified by Store's similar to those used in traditional Flux
+ * @param {Object} storeMap - A mapping of a property key to an object which contains a `reduce(state, action, waitFor)` method
+*/
+export function fluxEnhancer(storeMap) {
   return (storeCreator) => {
     return (reducer, initialState) => {
+      // Map stores -> keys for easy access in reduce
+      let storesToKeys = _.reduce(storeMap, (result, store, key) => {
+        return result.set(store, key);
+      }, new Map());
 
-      let storeMap = initializeStoreMap(stateStoreMap);
+      // This allows Stores to call getState() on a different store
+      // that it depends on in the middle of its own reduction, using
+      // the other store's value after it reduces the action.
       let partiallyReducedState = null;
+
+      // Runs an action through all the stores and returns a new state
+      // variable with the new state of all the keys in storeMap
       let reduceFromStores = (state = {}, action) => {
         let newState = {};
-        partiallyReducedState = _.assign({}, state);
+        let completedSet = new Set();
+        partiallyReducedState = Object.assign({}, state);
 
-        for (let entry of storeMap) {
-          let key = entry[1];
-          let store = entry[0];
-          if (!store.reduce) throw new Error(`${store.constructor.name} must provide a reduce function`);
-
-          newState[key] = store.reduce.bind(store)(state[key], action);
-          partiallyReducedState[key] = newState[key];
+        // Var is used since assignKey and waitFor call each other
+        var waitFor = (stores) => {
+          _.forEach(stores, (store) => assignKey(storesToKeys.get(store)));
         }
+
+        var assignKey = (key) => {
+          if (completedSet.has(key)) return;
+          let store = storeMap[key];
+          newState[key] = store.reduce.bind(store)(state[key], action, waitFor);
+          partiallyReducedState[key] = newState[key];
+          completedSet.add(key);
+        }
+
+        _.forEach(Object.keys(storeMap), assignKey)
+
         partiallyReducedState = null;
         return newState;
       }
@@ -66,7 +58,6 @@ export function fluxEnhancer(stateStoreMap) {
       };
 
       return store;
-
     };
   };
 }
