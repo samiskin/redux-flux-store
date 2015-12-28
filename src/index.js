@@ -8,7 +8,9 @@ import objectMerge from 'object-merge';
 */
 export function fluxEnhancer(storeMap) {
   return (storeCreator) => {
-    return (reducer, initialState) => {
+    return (inputReducer, initialState) => {
+      let reducer = inputReducer || (() => { return {}; });
+
       // Map stores -> keys for easy access in reduce
       let storesToKeys = _.reduce(storeMap, (result, store, key) => {
         return result.set(store, key);
@@ -27,29 +29,29 @@ export function fluxEnhancer(storeMap) {
         partiallyReducedState = Object.assign({}, state);
 
         // Var is used since assignKey and waitFor call each other
-        var waitFor = (stores) => {
-          _.forEach(stores, (store) => assignKey(storesToKeys.get(store)));
-        }
+        var waitFor = (stores) => { // eslint-disable-line
+          _.forEach(stores, (store) => assignKey(storesToKeys.get(store))); // eslint-disable-line
+        };
 
-        var assignKey = (key) => {
+        var assignKey = (key) => { // eslint-disable-line
           if (completedSet.has(key)) return;
           let store = storeMap[key];
           newState[key] = store.reduce.bind(store)(state[key], action, waitFor);
           partiallyReducedState[key] = newState[key];
           completedSet.add(key);
-        }
+        };
 
-        _.forEach(Object.keys(storeMap), assignKey)
+        _.forEach(Object.keys(storeMap), assignKey);
 
         partiallyReducedState = null;
         return newState;
-      }
+      };
 
       let augmentedReducer = (state, action) => {
         let storeResult = reduceFromStores(state, action);
         let reducerResult = reducer(state, action);
         return objectMerge(reducerResult, storeResult);
-      }
+      };
 
       let store = storeCreator(augmentedReducer, initialState);
       let storeDotGetState = store.getState;

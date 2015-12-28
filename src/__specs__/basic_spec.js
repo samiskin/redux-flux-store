@@ -54,15 +54,27 @@ class DependantCounterStoreClass extends IndependantCounterStoreClass{
 var DependantCounterStore = new DependantCounterStoreClass();
 var IndependantCounterStore = new IndependantCounterStoreClass();
 
-store = fluxEnhancer({
-  counterIndependant: IndependantCounterStore,
-  counter: DependantCounterStore,
-  increment: IncrementStore
-})(createStore)(basicReducer);
 
 test('Basic functionality', (t) => {
-  t.plan(2);
+  t.plan(3);
+
+
+  try {
+    store = fluxEnhancer({
+      counterIndependant: IndependantCounterStore,
+      counter: DependantCounterStore,
+      increment: IncrementStore
+    })(createStore)();
+  } catch (e) {
+    t.fail('Errored on no reducer');
+  }
+  t.pass('Created store without a reducer');
+
   t.deepEquals(store.getState(), {counter: 0, counterIndependant: 0, increment: 1});
   store.dispatch({type: 'INCREMENT'});
   t.deepEquals(store.getState(), {counter: 2, counterIndependant: 1, increment: 2});
+
+
 });
+
+
