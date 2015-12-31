@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import objectMerge from 'object-merge';
+import objectMerge from './object-merge';
 
 /**
  * Creates a store enhancer which augments the store's state to include keys
