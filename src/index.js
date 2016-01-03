@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import objectMerge from './object-merge';
 
 /**
  * Creates a store enhancer which augments the store's state to include keys
@@ -9,7 +8,7 @@ import objectMerge from './object-merge';
 export function fluxEnhancer(storeMap) {
   return (storeCreator) => {
     return (inputReducer, initialState) => {
-      let reducer = inputReducer || (() => { return {}; });
+      let reducer = inputReducer || ((state) => { return state; });
 
       // Map stores -> keys for easy access in reduce
       let storesToKeys = _.reduce(storeMap, (result, store, key) => {
@@ -49,8 +48,8 @@ export function fluxEnhancer(storeMap) {
 
       let augmentedReducer = (state, action) => {
         let storeResult = reduceFromStores(state, action);
-        let reducerResult = reducer(state, action);
-        return objectMerge(reducerResult, storeResult);
+        let reducerResult = reducer(storeResult, action);
+        return reducerResult;
       };
 
       let store = storeCreator(augmentedReducer, initialState);

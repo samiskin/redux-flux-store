@@ -5,9 +5,6 @@ import { createStore } from 'redux';
 
 
 var store = null;
-let basicReducer = (state = {}, action) => {
-  return state;
-}
 
 class IncrementStoreClass {
 
