@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 /**
  * Creates a store enhancer which augments the store's state to include keys
  * and values specified by Store's similar to those used in traditional Flux
@@ -11,8 +9,8 @@ export function fluxEnhancer(storeMap) {
       let reducer = inputReducer || ((state) => { return state; });
 
       // Map stores -> keys for easy access in reduce
-      let storesToKeys = _.reduce(storeMap, (result, store, key) => {
-        return result.set(store, key);
+      let storesToKeys = Object.keys(storeMap).reduce((result, key) => {
+        return result.set(storeMap[key], key);
       }, new Map());
 
       // This allows Stores to call getState() on a different store
@@ -29,7 +27,7 @@ export function fluxEnhancer(storeMap) {
 
         // Var is used since assignKey and waitFor call each other
         var waitFor = (stores) => { // eslint-disable-line
-          _.forEach(stores, (store) => assignKey(storesToKeys.get(store))); // eslint-disable-line
+          stores.forEach((store) => assignKey(storesToKeys.get(store))); // eslint-disable-line
         };
 
         var assignKey = (key) => { // eslint-disable-line
@@ -40,7 +38,7 @@ export function fluxEnhancer(storeMap) {
           completedSet.add(key);
         };
 
-        _.forEach(Object.keys(storeMap), assignKey);
+        Object.keys(storeMap).forEach(assignKey);
 
         partiallyReducedState = null;
         return newState;
